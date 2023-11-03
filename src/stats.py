@@ -54,3 +54,103 @@ def avg_w_n(df, field, dp=1):
 
       # Round to the specified decimal places
       return round(pooled_weighted_mean, dp)
+
+def corr_w(df, dfPbf, dfW):
+
+    # Convert dataframe to series if it's a DataFrame
+    if isinstance(df, pd.DataFrame):
+        df = df.iloc[:, 0]
+
+    # Drop missing values
+    combined_data = pd.concat([df, dfPbf, pd.Series(dfW)], axis=1)
+    combined_data.dropna(inplace=True)
+
+    df_filtered = combined_data.iloc[:, 0]
+    dfPbf_filtered = combined_data.iloc[:, 1]
+    dfW_filtered = combined_data.iloc[:, 2]
+
+    # Calculate weighted means
+    x_weighted_mean = np.sum(np.multiply(dfW_filtered, df_filtered)) / np.sum(dfW_filtered)
+    y_weighted_mean = np.sum(np.multiply(dfW_filtered, dfPbf_filtered)) / np.sum(dfW_filtered)
+
+    # Calculate weighted covariance and variances
+    cov_weighted = np.sum(dfW_filtered * (df_filtered - x_weighted_mean) * (dfPbf_filtered - y_weighted_mean))
+    var_x_weighted = np.sum(dfW_filtered * (df_filtered - x_weighted_mean)**2)
+    var_y_weighted = np.sum(dfW_filtered * (dfPbf_filtered - y_weighted_mean)**2)
+
+    # Calculate weighted correlation
+    return cov_weighted / np.sqrt(var_x_weighted * var_y_weighted)
+
+def corr_w_mat(df, dfW):
+    """
+    Calculate a weighted correlation matrix for a DataFrame.
+
+    :param df: A pandas DataFrame where each column represents a variable.
+    :param dfW: A pandas Series or a list of sample weights.
+    :return: A weighted correlation matrix.
+    """
+    # If dfW is a DataFrame with one column, convert it to a Series
+    if isinstance(dfW, pd.DataFrame):
+        if dfW.shape[1] == 1:
+            dfW = dfW.iloc[:, 0]
+        else:
+            raise ValueError("dfW should be a Series or a DataFrame with only one column of weights.")
+        
+    # Ensure dfW is a pandas Series
+    dfW = pd.Series(dfW) if not isinstance(dfW, pd.Series) else dfW
+
+    # Initialize an empty DataFrame to store the weighted correlation matrix
+    corr_matrix = pd.DataFrame(index=df.columns, columns=df.columns)
+
+    # Iterate over combinations of columns to calculate pairwise weighted correlations
+    for col1 in df.columns:
+        for col2 in df.columns:
+            combined_data = pd.concat([df[col1], df[col2], dfW], axis=1).dropna()
+            w = combined_data.iloc[:, 2]
+
+            # Calculate the means
+            mean1 = np.average(combined_data.iloc[:, 0], weights=w)
+            mean2 = np.average(combined_data.iloc[:, 1], weights=w)
+
+            # Calculate the sum of weights for non-null pairs
+            w_sum = w.sum()
+
+            # Calculate weighted covariance
+            cov_weighted = np.sum(w * (combined_data.iloc[:, 0] - mean1) * (combined_data.iloc[:, 1] - mean2)) / w_sum
+
+            # Calculate weighted variances
+            var1_weighted = np.sum(w * (combined_data.iloc[:, 0] - mean1)**2) / w_sum
+            var2_weighted = np.sum(w * (combined_data.iloc[:, 1] - mean2)**2) / w_sum
+
+            # Calculate the weighted correlation
+            corr = cov_weighted / np.sqrt(var1_weighted * var2_weighted)
+
+            # Assign the correlation to the correct place in the matrix
+            corr_matrix.loc[col1, col2] = corr
+
+    return corr_matrix.astype(float)
+
+def scorr_w_mat(df, dfW):
+
+    """
+    Calculate a weighted Spearman correlation matrix for a DataFrame.
+
+    :param df: A pandas DataFrame where each column represents a variable.
+    :param dfW: A pandas Series or a DataFrame with a single column of sample weights.
+    :return: A weighted Spearman correlation matrix.
+    """
+    # If dfW is a DataFrame with one column, convert it to a Series
+    if isinstance(dfW, pd.DataFrame):
+        if dfW.shape[1] == 1:
+            dfW = dfW.iloc[:, 0]
+        else:
+            raise ValueError("dfW should be a Series or a DataFrame with only one column of weights.")
+
+    # Ensure dfW is a pandas Series
+    dfW = pd.Series(dfW) if not isinstance(dfW, pd.Series) else dfW
+
+    # Rank the data
+    ranked_df = df.rank(method="average")
+
+    # Use the Pearson correlation function on ranked data to get Spearman correlation
+    return corr_w_mat(ranked_df, dfW)
