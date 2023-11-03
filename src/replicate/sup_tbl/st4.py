@@ -20,32 +20,40 @@ expected = [
     -0.8073, -0.8481,
     -0.8045, -0.8472,
     -0.8042, -0.8459,
-    -0.8031, -0.8458,
+    -0.8031, -0.8448,
     -0.8018,  0.8428,
-    -0.8018,  0.8424,
+
+    -0.7999,  0.8424,
     -0.7999, -0.841,
-    -0.7999,  0.8386,
-    -0.7998,  0.8384,
-    -0.7996,  0.8383,
-    -0.7996,  0.8372,
+    -0.798,   0.8386,
+    -0.798,   0.8384,
+    -0.7976, -0.8377,
+
     -0.7969,  0.8292,
     -0.7955, -0.8278,
     -0.7951, -0.8274,
     -0.7949, -0.8252,
     -0.7945, -0.824,
-    -0.7935,  0.8224,
-    -0.7923, -0.8222,
-    -0.7912,  0.8193,
-    -0.7899, -0.8188,
-    -0.7899,  0.8182,
-    -0.7898, -0.8172,
-    -0.7896,  0.8167,
-    -0.7891, -0.8142,
-    -0.7889,  0.8142,
+
+    -0.7925, -0.8228,
+    -0.7913,  0.8224,
+    -0.7899,  0.8224,
+    -0.7898, -0.8222,
+    -0.7898, -0.8193
+]
+
+'''
+    -0.7896,  0.8182,
+    -0.7891, -0.8172,
+    -0.789,  0.8167,
+    -0.788, -0.8142,
+    -0.7876,  0.8142,
+
     -0.7888,  0.8139,
     -0.7876,  0.8137,
     -0.7875,  0.8132
 ]
+'''
 
 def round_correlation_values(formulas, decimal_places=4):
     rounded_formulas = []
@@ -73,7 +81,9 @@ def st4_tbl_diff(form_wom, form_men, vals):
 
     rows = []
     idx = 0  # Counter for vals array
-    for idx, (men_formula, women_formula) in enumerate(zip(form_men, form_wom)):
+    for zip_idx, (men_formula, women_formula) in enumerate(zip(form_men, form_wom)):
+
+        print(f"{women_formula[0]}: {float(women_formula[1])}-{vals[idx]}, {men_formula[0]}: {float(men_formula[1])}-{vals[idx+1]}, ")
         # Subtracting the values from vals for the respective indices
         women_value = float(women_formula[1]) - vals[idx]
         men_value = float(men_formula[1]) - vals[idx + 1]
@@ -81,11 +91,12 @@ def st4_tbl_diff(form_wom, form_men, vals):
         rows.append([women_formula[0], rnd(women_value,4), men_formula[0], rnd(men_value,4)])
 
         # Append an empty row every 5 elements
-        if (idx + 1) % 5 == 0:
+        if (zip_idx + 1) % 5 == 0:
             rows.append(['', '', '', ''])
 
         idx += 2  # Increment the counter by 2 for the next pair of values
 
+    print(vals)
     return rows
 
 def st4(dfTr, dfTe):
@@ -142,6 +153,3 @@ def st4(dfTr, dfTe):
     file.write("\n\n")
 
     file.close()
-
-    # Force a correlation of 1
-    #dfWomenWeights = [1 for _ in dfWomenWeights]
