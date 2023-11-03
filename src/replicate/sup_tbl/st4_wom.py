@@ -39,8 +39,8 @@ def corr(df):
 def gen_wom_fs(df, dfWs, isCw = False):
 
     c = None
-    if isCw:    c = corr
-    else:       c = corr_w
+    if isCw:    c = corr_w
+    else:       c = corr
     
     global dfPbf
     global dfW
