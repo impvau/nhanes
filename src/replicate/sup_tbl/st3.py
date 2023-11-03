@@ -14,7 +14,7 @@ dfTest = None
 dfWomen = None
 dfMen = None
 
-paper_vals_wom = [
+paper_vals_wom = np.array([
      0,      0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
      0.78,   0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
      0.76,   0.9,   0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
@@ -27,9 +27,9 @@ paper_vals_wom = [
      0.25,   0.35,  0.41,  0.45,  0.55,  0.26,  0.43,  0.23,  0.44,  0,     0,     0,
     -0.11,  -0.02, -0.07,  0.11,  0.32,  0.07,  0.24,  0,     0.28,  0.61,  0,     0,
     -0.11,  -0.05, -0.06,  0.04,  0.18,  0.09,  0.3,   0.02,  0.24,  0.44,  0.63,  0
-]
+])
 
-paper_vals_men = [
+paper_vals_men = np.array([
     0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0,
     0.74, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0,
     0.83, 0.91, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0,
@@ -42,7 +42,7 @@ paper_vals_men = [
     0.17, 0.28, 0.37, 0.40, 0.54, 0.24, 0.38, 0.19, 0.41, 0.00, 0.00, 0,
    -0.06, 0.05, 0.16, 0.26, 0.46, 0.10, 0.33, 0.02, 0.36, 0.69, 0.00, 0,
    -0.14, 0.01, 0.02, 0.20, 0.29, 0.06, 0.35, 0.02, 0.27, 0.50, 0.67, 0
-]
+])
 
 rows = [
     ("Body mass index (BMI)", "kg/m2"),
@@ -60,12 +60,7 @@ rows = [
 
 headers = ["BFP*", "BMI", "WAIST", "ARMC", "BW", "TRI", "THIGH", "SUB", "CALF", "ARML", "Height", ""]
 
-def st3_tbl(df, dfW = None):
-
-    #matrix = df.corr(method='pearson', min_periods=1)
-    matrix = df.corr()
-    mask = np.triu(np.ones_like(matrix, dtype=bool))
-    matrix[mask] = np.nan
+def st3_tbl_rows(matrix):
 
     new_rows = []  # Create a new list to store the updated rows
     for i, (desc, unit) in enumerate(rows):
@@ -79,7 +74,39 @@ def st3_tbl(df, dfW = None):
             new_row = [desc, unit] + [''] * (len(headers) - 2)  # Fill with empty strings if no data is available
         new_rows.append(new_row)
 
-    return new_rows, None
+    return new_rows
+
+def st3_tbl(df, dfW = None, isSp = False):
+
+    matrix = None
+    if dfW is not None:
+        if isSp:
+            matrix = scorr_w_mat(df, dfW)
+        else:
+            matrix = corr_w_mat(df, dfW)
+    else:
+        matrix = df.corr()
+        # Default ~ to the pearson piecewise approach on i.e.
+        # matrix = df.corr(method='pearson', min_periods=1)
+
+    mask = np.triu(np.ones_like(matrix, dtype=bool))
+    matrix[mask] = np.nan
+
+    new_rows = st3_tbl_rows(matrix)
+
+    # Initialize a NumPy array with 12 zeros
+    float_data_rows = np.zeros(12)
+    for new_row in new_rows:
+        # Take the slice from the 3rd element onwards and convert to float
+        # Replace empty strings with 0 (since np.nan will be converted to 0 later)
+        float_row = [float(value) if value else 0 for value in new_row[2:]]
+        # Use numpy.concatenate to add to the NumPy array
+        float_data_rows = np.concatenate((float_data_rows, float_row))
+
+    # Convert NaNs to 0, in this case, it might be redundant since you've already replaced empty strings with 0
+    float_array = np.nan_to_num(float_data_rows)
+
+    return new_rows, float_array
 
 def st3(dfTr, dfTe):
     
@@ -99,10 +126,8 @@ def st3(dfTr, dfTe):
     # Replication table; Filter according to the paper
     file.write("## Replication\n")
     file.write( "Our attempts to exactly replicate the third table in the suppimentary material. "
-                "\n\n"            
-                #" We could only"
-                #" achieve the precise totals by including the race demographics that are excluded from the work "
-                #"(r=2, r=5, r=. missing). \n\n"
+                " We could only achieve the precise totals by including the race demographics that "
+                " are excluded from the work (r=2, r=5, r=. missing). \n\n"
     )
     
     # Get data based on paper
@@ -118,56 +143,165 @@ def st3(dfTr, dfTe):
     rows_men, vals_men  = st3_tbl(dfMen)
     file.write(tabulate(rows_men, headers)+"\n\n")
 
-    '''
-    ## Diffs
-    file.write("\n")
-    file.write("# Supplimentary Table 3 Paper-Replication Diff \n")
-    file.write(" We observe a -0.07 when we expect a 0.07 and see a difference of -0.014, so we suspect this is a typo with the sign. Outside of this, all correlations are within 0.01 error \n\n")
+    # Diffs to paper 
+    file.write("## Diff: Paper-Replication Table")
+    file.write( "We observe an error of 0.14 on a value of 0.07, for which we believe there is a "
+                " typo in the sign of the correlation. "
+                "\n\n"
+    )
 
-    # Convert paper_vals_men into a DataFrame
-    paper_vals_wom_df = pd.DataFrame(np.reshape(paper_vals_wom, wom_matrix.shape), 
-                                    index=wom_matrix.index, columns=wom_matrix.columns)
+    wom_diff = paper_vals_wom - vals_wom
+    wom_diff = pd.DataFrame(wom_diff.reshape(-1, 12))
+    rows_wom_diff = st3_tbl_rows(wom_diff)
+    file.write(tabulate(pd.DataFrame(rows_wom_diff), headers)+"\n\n")
 
-    # Compute the difference
-    wom_matrix_diff = paper_vals_wom_df - wom_matrix
+    men_diff = paper_vals_men - vals_men
+    men_diff = pd.DataFrame(men_diff.reshape(-1, 12))
+    rows_men_diff = st3_tbl_rows(men_diff)
+    file.write(tabulate(pd.DataFrame(rows_men_diff), headers)+"\n\n")
+    
+    # Replication using the correct data
 
-    rows_wom = st3_tbl(wom_matrix_diff)  # Compute rows for the men's matrix
-    file.write(tabulate(rows_wom, headers))
-    file.write("\n\n")
-
-    # Convert paper_vals_men into a DataFrame
-    paper_vals_men_df = pd.DataFrame(np.reshape(paper_vals_men, men_matrix.shape), 
-                                    index=men_matrix.index, columns=men_matrix.columns)
-
-    # Compute the difference
-    men_matrix_diff = paper_vals_men_df - men_matrix
-
-    rows_men = st3_tbl(men_matrix_diff)  # Compute rows for the men's matrix
-    file.write(tabulate(rows_men, headers))
-    file.write("\n\n")
-
-    # Heading
-    file.write("\n")
-    file.write("# Our Data \n")
-    file.write( "Correlation matrix (unweighted Pearson’s r) between DXA-estimated whole-body fat percentage "
-                "and common anthropometrics among adult individuals (≥20 years old) in the training dataset .\n\n")
-
-    # Female correlations
-    dfTrain = f_all_ours(dfTr)
+    file.write("## Replication With Correct demongraphics\n")
+    file.write( "Our correlations after excluding (r=2, r=5, r=. missing) "
+                "\n\n"
+    )
+    # Get data based on paper
+    dfTrain = f_all_paper(dfTr)
+    dfTrain = f_race(dfTrain)
     dfWomen = f_wom(dfTrain)
     dfWomen, dfWomenWeights = f_vars(dfWomen)
-
-    # Male correlations
     dfMen = f_men(dfTrain)
     dfMen, dfMenWeights = f_vars(dfMen)
 
-    # Heading
-    file.write("\n")
-    file.write("## Weighted Correlations \n")
-    file.write( "Correlation matrix (unweighted Pearson’s r) between DXA-estimated whole-body fat percentage "
-                "and common anthropometrics among adult individuals (≥20 years old) in the training dataset .\n\n")
-    '''
-    
+    rows_wom, vals_wom  = st3_tbl(dfWomen)
+    file.write(tabulate(rows_wom, headers)+"\n\n")
+
+    rows_men, vals_men  = st3_tbl(dfMen)
+    file.write(tabulate(rows_men, headers)+"\n\n")
+
+    # Diffs to paper 
+    file.write("## Diff: Paper-Replication Table")
+    file.write( "We observe the correlations are still very close, but there is many more correlations that no longer have zero error "
+                "and one observation exceeds the 0.01 uncertainty"
+                "\n\n"
+    )
+
+    wom_diff = paper_vals_wom - vals_wom
+    wom_diff = pd.DataFrame(wom_diff.reshape(-1, 12))
+    rows_wom_diff = st3_tbl_rows(wom_diff)
+    file.write(tabulate(pd.DataFrame(rows_wom_diff), headers)+"\n\n")
+
+    men_diff = paper_vals_men - vals_men
+    men_diff = pd.DataFrame(men_diff.reshape(-1, 12))
+    rows_men_diff = st3_tbl_rows(men_diff)
+    file.write(tabulate(pd.DataFrame(rows_men_diff), headers)+"\n\n")
+
+    # Our Data
+    file.write("# Our Data")
+    file.write( "We compute wil missing samples filtered "
+                "\n\n"
+    )
+
+    # Get data based on paper
+    dfTrain = f_all_ours(dfTr)
+    dfWomen = f_wom(dfTrain)
+    dfWomen, dfWomenWeights = f_vars(dfWomen)
+    dfMen = f_men(dfTrain)
+    dfMen, dfMenWeights = f_vars(dfMen)
+
+    rows_wom, vals_ours_wom  = st3_tbl(dfWomen)
+    file.write(tabulate(rows_wom, headers)+"\n\n")
+
+    rows_men, vals_ours_men  = st3_tbl(dfMen)
+    file.write(tabulate(rows_men, headers)+"\n\n")
+
+    # Diffs to paper 
+    file.write("## Diff: Paper-Replication Table")
+    file.write( "The difference suggests that there is minor difference to the pairwise approach and simply removing these samples, but it is non-zero (~12% in some cases)"
+                "\n\n"
+    )
+
+    wom_diff = paper_vals_wom - vals_ours_wom
+    wom_diff = pd.DataFrame(wom_diff.reshape(-1, 12))
+    rows_wom_diff = st3_tbl_rows(wom_diff)
+    file.write(tabulate(pd.DataFrame(rows_wom_diff), headers)+"\n\n")
+
+    men_diff = paper_vals_men - vals_ours_men
+    men_diff = pd.DataFrame(men_diff.reshape(-1, 12))
+    rows_men_diff = st3_tbl_rows(men_diff)
+    file.write(tabulate(pd.DataFrame(rows_men_diff), headers)+"\n\n")
+
+    # Using weighted correlations
+    file.write("## Weighted correlations Table")
+    file.write( ""
+                "\n\n"
+    )
+
+    # Get data based on paper
+    dfTrain = f_all_ours(dfTr)
+    dfWomen = f_wom(dfTrain)
+    dfWomen, dfWomenWeights = f_vars(dfWomen)
+    dfMen = f_men(dfTrain)
+    dfMen, dfMenWeights = f_vars(dfMen)
+
+    rows_wom, vals_pcorr_w_wom  = st3_tbl(dfWomen, dfWomenWeights)
+    file.write(tabulate(rows_wom, headers)+"\n\n")
+
+    rows_men, vals_pcorr_w_men  = st3_tbl(dfMen, dfMenWeights)
+    file.write(tabulate(rows_men, headers)+"\n\n")
+
+    # Using weighted correlations
+    file.write("## Diff Our Data Unweighted Correlation to Weighted correlations Table")
+    file.write( "We observe a further difference within the data when considering weighting of 7%"
+                "\n\n"
+    )
+
+    wom_diff = vals_ours_wom - vals_pcorr_w_wom
+    wom_diff = pd.DataFrame(wom_diff.reshape(-1, 12))
+    rows_wom_diff = st3_tbl_rows(wom_diff)
+    file.write(tabulate(pd.DataFrame(rows_wom_diff), headers)+"\n\n")
+
+    men_diff = vals_ours_men - vals_pcorr_w_men
+    men_diff = pd.DataFrame(men_diff.reshape(-1, 12))
+    rows_men_diff = st3_tbl_rows(men_diff)
+    file.write(tabulate(pd.DataFrame(rows_men_diff), headers)+"\n\n")
+
+    # Using weighted correlations
+    file.write("## Spearman correlations Table")
+    file.write( ""
+                "\n\n"
+    )
+
+    # Get data based on paper
+    dfTrain = f_all_ours(dfTr)
+    dfWomen = f_wom(dfTrain)
+    dfWomen, dfWomenWeights = f_vars(dfWomen)
+    dfMen = f_men(dfTrain)
+    dfMen, dfMenWeights = f_vars(dfMen)
+
+    rows_wom, vals_wom  = st3_tbl(dfWomen, dfWomenWeights, True)
+    file.write(tabulate(rows_wom, headers)+"\n\n")
+
+    rows_men, vals_men  = st3_tbl(dfMen, dfMenWeights, True)
+    file.write(tabulate(rows_men, headers)+"\n\n")
+
+    # Using weighted correlations
+    file.write("## Diff Our Weighted Pearson to Our Weighted Spearman")
+    file.write( "Minor differences ~2% observed"
+                "\n\n"
+    )
+
+    wom_diff = vals_pcorr_w_wom - vals_wom
+    wom_diff = pd.DataFrame(wom_diff.reshape(-1, 12))
+    rows_wom_diff = st3_tbl_rows(wom_diff)
+    file.write(tabulate(pd.DataFrame(rows_wom_diff), headers)+"\n\n")
+
+    men_diff = vals_pcorr_w_men - vals_men
+    men_diff = pd.DataFrame(men_diff.reshape(-1, 12))
+    rows_men_diff = st3_tbl_rows(men_diff)
+    file.write(tabulate(pd.DataFrame(rows_men_diff), headers)+"\n\n")
+
     file.close()
 
 
