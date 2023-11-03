@@ -73,13 +73,15 @@ def gen_men_fs(df, dfWs, isCw = False):
 
         (   r"$$\dfrac{h}{{ab}^3}$$",                   c(df[iHeight]/(df[iWaist].pow(3)))),
         (   r"$$\sqrt{ab}$$",                           c(df[iWaist].pow(0.5))),
+        (   r"$$\sqrt{ab}$$",                           c(df[iWaist].pow(0.5))),
         (   r"$$\dfrac{h^2}{{ab}^{1.5}*\sqrt{w}}$$",    c(df[iHeight].pow(2)/(df[iWaist].pow(1.5)*df[iWeight].pow(0.5)))),
         (   r"$$\dfrac{h^2}{{ab}^2 * \sqrt{w}}$$",      c(df[iHeight].pow(2)/(df[iWaist].pow(2)*df[iWeight].pow(0.5)))),
-        (   r"$$\dfrac{{ab}^3}{w}$$",                   c(df[iWaist].pow(3)/df[iWeight].pow(0.5))),
 
     ]
 
     '''
+    #(   r"$$\dfrac{{ab}^3}{w}$$",                   c(df[iWaist].pow(3)/df[iWeight].pow(0.5))),
+    
     (r"\dfrac{h^{1.5}}{ab}", (df[iHeight].pow(1.5)/(df[iWaist]))),
     (r"\dfrac{ab}{\sqrt{c}}", (df[iWaist]/(df[iCalf].pow(0.5)))),
     (r"\dfrac{h^2}{ab * \sqrt{w}}", (df[iHeight].pow(2)/(df[iWaist]*df[iWeight].pow(0.5)))),
