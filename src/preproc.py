@@ -24,12 +24,12 @@ def preproc(dir):
                     logicalDs = logicalDs.replace("_B", "")
                     logicalDs = logicalDs.replace("_C", "")
                     logicalDs = logicalDs+"_Train"
-                    print(f"Train: {fullDs} {df[iSampleNo].nunique()}")
+                    #print(f"Train: {fullDs} {df[iSampleNo].nunique()}")
                 
                 elif '2005' in year:
                     logicalDs = logicalDs.replace("_D", "")
                     logicalDs = logicalDs+"_Test"
-                    print(f"Test: {fullDs} {df[iSampleNo].nunique()}")
+                    #print(f"Test: {fullDs} {df[iSampleNo].nunique()}")
                         
                 # If the dataset type is already in our dictionary, append the data.
                 # Otherwise, initialize a new dataframe for this dataset type.
@@ -38,27 +38,37 @@ def preproc(dir):
                 else:
                     dfs[logicalDs] = df
 
+
     dfTrain = dfs['DEMO_Train'].merge(dfs['DXX_Train'], on=iSampleNo, how='left') 
     dfTrain = dfTrain.merge(dfs['BMX_Train'], on=iSampleNo, how='left') 
 
     dfTest = dfs['DEMO_Test'].merge(dfs['DXX_Test'], on=iSampleNo, how='left') 
     dfTest = dfTest.merge(dfs['BMX_Test'], on=iSampleNo, how='left') 
 
+    # Apply the calculation directly for dfTrain
+    dfTrain['SampleWeight'] = dfTrain.apply(lambda row: 2/3 * row['WTMEC4YR'] if row['SDDSRVYR'] in (1, 2) else (1/3 * row['WTMEC2YR'] if row['SDDSRVYR'] == 3 else None), axis=1)
+    dfTest['SampleWeight'] = dfTest[iSampleWeight05_06]
+
     # Add BMI fields
     dfTrain[iBMICalc] = (dfTrain[iWeight] / ((dfTrain[iHeight] / 100) ** 2)) 
     dfTest[iBMICalc] = (dfTest[iWeight] / ((dfTest[iHeight] / 100) ** 2))
 
-    # Fill 4Y sample weight with 2Y sample weight where 4 does not exist
     dfTrain[iSampleWeight] = dfTrain[iSampleWeight].fillna(dfTrain[iSampleWeight05_06])
 
     # Take means
     dfTrain = df_mean(dfTrain)
     dfTest = df_mean(dfTest)
 
-    # Adjust values if necessary
-    dfTrain.loc[:, iBodyFat] = dfTrain[iBodyFat].div(1000, fill_value=0)
-    dfTrain.loc[:, iFatFreeMass] = dfTrain[iFatFreeMass].div(1000, fill_value=0)
-    dfTest.loc[:, iBodyFat] = dfTest[iBodyFat].div(1000, fill_value=0)
-    dfTest.loc[:, iFatFreeMass] = dfTest[iFatFreeMass].div(1000, fill_value=0)
+    # Adjust tricep skinfold and subscapular from mm to cm
+    dfTrain.loc[:, iSubscap] = dfTrain[iSubscap].div(10)
+    dfTest.loc[:, iSubscap] = dfTest[iSubscap].div(10)
+
+    dfTrain.loc[:, iTricep] = dfTrain[iTricep].div(10)
+    dfTest.loc[:, iTricep] = dfTest[iTricep].div(10)
+
+    dfTrain.loc[:, iBodyFat] = dfTrain[iBodyFat].div(1000)
+    dfTrain.loc[:, iFatFreeMass] = dfTrain[iFatFreeMass].div(1000)
+    dfTest.loc[:, iBodyFat] = dfTest[iBodyFat].div(1000)
+    dfTest.loc[:, iFatFreeMass] = dfTest[iFatFreeMass].div(1000)
 
     return dfTrain, dfTest

@@ -65,17 +65,14 @@ def f_all_paper(df, isTr = True):
     else:           df = f_age_te(df)
 
     df = f_na_paper(df)
-
+    
     return df
 
 ### Apply additional filters according to our paper
 def f_all_ours(df, isTr = True):
 
-    df = f_all_paper(df, isTr)  # Do all Woolcot does
-    df = f_race(df)             # Filter by race classes we are considering !!! Authors do not do this      
-
-    # Drop na values in other fields
-    if isTr:    df = df.dropna(subset=iTrConsidered, axis=0)            
-    else:       df = df.dropna(subset=iTeConsidered, axis=0)            
+    df = f_all_paper(df, isTr)                  # Do all Woolcot does
+    df = f_race(df)                             # Filter by race classes we are considering !!! Authors do not do this      
+    df = df.dropna(subset=iConsider, axis=0)    # Drop na values in other fields    
 
     return df

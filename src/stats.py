@@ -12,24 +12,33 @@ def df_cnt(df):     return df[iSampleNo].count()
 
 def pct_w(df1, df2, dp = 1):
     
-      try:
-            weights1 = df1.apply(lambda row: row[iSampleWeight05_06] if pd.isna(row[iSampleWeight]) else row[iSampleWeight], axis=1)
-            weights2 = df2.apply(lambda row: row[iSampleWeight05_06] if pd.isna(row[iSampleWeight]) else row[iSampleWeight], axis=1)
-            ratio = weights1.sum()/weights2.sum()
-            return rnd(ratio*100,dp)
-    
-      except:
-            ratio = df1[iSampleWeight05_06].sum()/df2[iSampleWeight05_06].sum()
-            return rnd(ratio*100,dp)
+    ratio = df1[iSampWeight].sum()/df2[iSampWeight].sum()
+    return rnd(ratio*100,dp)
+
+    '''
+    try:
+        #weights1 = df1.apply(lambda row: row[iSampleWeight05_06] if pd.isna(row[iSampleWeight]) else row[iSampleWeight], axis=1)
+        #weights2 = df2.apply(lambda row: row[iSampleWeight05_06] if pd.isna(row[iSampleWeight]) else row[iSampleWeight], axis=1)
+        ratio = df1[iSampWeight].sum()/df2[iSampWeight].sum()
+        return rnd(ratio*100,dp)
+
+    except:
+        ratio = df1[iSampleWeight05_06].sum()/df2[iSampleWeight05_06].sum()
+        return rnd(ratio*100,dp)
+    '''
 
 def avg_w(df, field, dp = 1):
     
-      try:
-            weights = df.apply(lambda row: row[iSampleWeight05_06] if pd.isna(row[iSampleWeight]) else row[iSampleWeight], axis=1)
-            return rnd((df[field] * weights).sum() / weights.sum(), dp)
-    
-      except:
-            return rnd((df[field]*df[iSampleWeight05_06]).sum()/df[iSampleWeight05_06].sum(),dp)       
+    return rnd((df[field] * df[iSampWeight]).sum() / df[iSampWeight].sum(), dp)
+
+    '''
+    try:
+        weights = df.apply(lambda row: row[iSampleWeight05_06] if pd.isna(row[iSampleWeight]) else row[iSampleWeight], axis=1)
+        return rnd((df[field] * weights).sum() / weights.sum(), dp)
+
+    except:
+        return rnd((df[field]*df[iSampleWeight05_06]).sum()/df[iSampleWeight05_06].sum(),dp)       
+    '''
 
 def avg_w_n(df, field, dp=1):
     

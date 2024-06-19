@@ -111,7 +111,7 @@ def st2_age_pct():
     # Age Category data collection
     age_categories = [
         ("20-39 years old", f_age_y),
-        ("20-39 years old", f_age_m),  # This seems to be a duplicate label. Consider updating.
+        ("40-59 years old", f_age_m),  # This seems to be a duplicate label. Consider updating.
         (">=60 years old", f_age_a)
     ]
 
@@ -295,9 +295,9 @@ def st2(dfTr, dfTe):
 
     # Removing NAs
     file.write("## Table 1 Removing NaNs\n")
-    file.write(f"We remove NaNs from the columns {','.join(iTrConsidered)}. We do this to avoid any potential issues in correlation from missing values. \n\n")
+    file.write(f"We remove NaNs from the columns {','.join(iConsider)}. We do this to avoid any potential issues in correlation from missing values. \n\n")
     dfTrain = f_all_paper(dfTe)
-    dfTrain = dfTrain.dropna(subset=iTeConsidered, axis=0)
+    dfTrain = dfTrain.dropna(subset=iConsider, axis=0)
     dfWomen = f_wom(dfTrain)
     dfMen = f_men(dfTrain)
     dfWomenNonImp, dfWomenImp = f_nimp(dfWomen, False), f_imp(dfWomen, False)

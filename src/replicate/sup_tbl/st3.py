@@ -138,10 +138,10 @@ def st3(dfTr, dfTe):
     dfMen, dfMenWeights = f_vars(dfMen)
 
     rows_wom, vals_wom  = st3_tbl(dfWomen)
-    file.write(tabulate(rows_wom, headers)+"\n\n")
+    file.write(tabulate(rows_wom, headers, tablefmt="pipe")+"\n\n")
 
     rows_men, vals_men  = st3_tbl(dfMen)
-    file.write(tabulate(rows_men, headers)+"\n\n")
+    file.write(tabulate(rows_men, headers, tablefmt="pipe")+"\n\n")
 
     # Diffs to paper 
     file.write("## Diff: Paper-Replication Table")
@@ -153,12 +153,12 @@ def st3(dfTr, dfTe):
     wom_diff = paper_vals_wom - vals_wom
     wom_diff = pd.DataFrame(wom_diff.reshape(-1, 12))
     rows_wom_diff = st3_tbl_rows(wom_diff)
-    file.write(tabulate(pd.DataFrame(rows_wom_diff), headers)+"\n\n")
+    file.write(tabulate(pd.DataFrame(rows_wom_diff), headers, tablefmt="pipe")+"\n\n")
 
     men_diff = paper_vals_men - vals_men
     men_diff = pd.DataFrame(men_diff.reshape(-1, 12))
     rows_men_diff = st3_tbl_rows(men_diff)
-    file.write(tabulate(pd.DataFrame(rows_men_diff), headers)+"\n\n")
+    file.write(tabulate(pd.DataFrame(rows_men_diff), headers, tablefmt="pipe")+"\n\n")
     
     # Replication using the correct data
 
@@ -175,10 +175,10 @@ def st3(dfTr, dfTe):
     dfMen, dfMenWeights = f_vars(dfMen)
 
     rows_wom, vals_wom  = st3_tbl(dfWomen)
-    file.write(tabulate(rows_wom, headers)+"\n\n")
+    file.write(tabulate(rows_wom, headers, tablefmt="pipe")+"\n\n")
 
     rows_men, vals_men  = st3_tbl(dfMen)
-    file.write(tabulate(rows_men, headers)+"\n\n")
+    file.write(tabulate(rows_men, headers, tablefmt="pipe")+"\n\n")
 
     # Diffs to paper 
     file.write("## Diff: Paper-Replication Table")
@@ -190,12 +190,12 @@ def st3(dfTr, dfTe):
     wom_diff = paper_vals_wom - vals_wom
     wom_diff = pd.DataFrame(wom_diff.reshape(-1, 12))
     rows_wom_diff = st3_tbl_rows(wom_diff)
-    file.write(tabulate(pd.DataFrame(rows_wom_diff), headers)+"\n\n")
+    file.write(tabulate(pd.DataFrame(rows_wom_diff), headers, tablefmt="pipe")+"\n\n")
 
     men_diff = paper_vals_men - vals_men
     men_diff = pd.DataFrame(men_diff.reshape(-1, 12))
     rows_men_diff = st3_tbl_rows(men_diff)
-    file.write(tabulate(pd.DataFrame(rows_men_diff), headers)+"\n\n")
+    file.write(tabulate(pd.DataFrame(rows_men_diff), headers, tablefmt="pipe")+"\n\n")
 
     # Our Data
     file.write("# Our Data")
@@ -211,10 +211,10 @@ def st3(dfTr, dfTe):
     dfMen, dfMenWeights = f_vars(dfMen)
 
     rows_wom, vals_ours_wom  = st3_tbl(dfWomen)
-    file.write(tabulate(rows_wom, headers)+"\n\n")
+    file.write(tabulate(rows_wom, headers, tablefmt="pipe")+"\n\n")
 
     rows_men, vals_ours_men  = st3_tbl(dfMen)
-    file.write(tabulate(rows_men, headers)+"\n\n")
+    file.write(tabulate(rows_men, headers, tablefmt="pipe")+"\n\n")
 
     # Diffs to paper 
     file.write("## Diff: Paper-Replication Table")
@@ -225,12 +225,12 @@ def st3(dfTr, dfTe):
     wom_diff = paper_vals_wom - vals_ours_wom
     wom_diff = pd.DataFrame(wom_diff.reshape(-1, 12))
     rows_wom_diff = st3_tbl_rows(wom_diff)
-    file.write(tabulate(pd.DataFrame(rows_wom_diff), headers)+"\n\n")
+    file.write(tabulate(pd.DataFrame(rows_wom_diff), headers, tablefmt="pipe")+"\n\n")
 
     men_diff = paper_vals_men - vals_ours_men
     men_diff = pd.DataFrame(men_diff.reshape(-1, 12))
     rows_men_diff = st3_tbl_rows(men_diff)
-    file.write(tabulate(pd.DataFrame(rows_men_diff), headers)+"\n\n")
+    file.write(tabulate(pd.DataFrame(rows_men_diff), headers, tablefmt="pipe")+"\n\n")
 
     # Using weighted correlations
     file.write("## Weighted correlations Table")
@@ -246,10 +246,10 @@ def st3(dfTr, dfTe):
     dfMen, dfMenWeights = f_vars(dfMen)
 
     rows_wom, vals_pcorr_w_wom  = st3_tbl(dfWomen, dfWomenWeights)
-    file.write(tabulate(rows_wom, headers)+"\n\n")
+    file.write(tabulate(rows_wom, headers, tablefmt="pipe")+"\n\n")
 
     rows_men, vals_pcorr_w_men  = st3_tbl(dfMen, dfMenWeights)
-    file.write(tabulate(rows_men, headers)+"\n\n")
+    file.write(tabulate(rows_men, headers, tablefmt="pipe")+"\n\n")
 
     # Using weighted correlations
     file.write("## Diff Our Data Unweighted Correlation to Weighted correlations Table")
@@ -260,12 +260,12 @@ def st3(dfTr, dfTe):
     wom_diff = vals_ours_wom - vals_pcorr_w_wom
     wom_diff = pd.DataFrame(wom_diff.reshape(-1, 12))
     rows_wom_diff = st3_tbl_rows(wom_diff)
-    file.write(tabulate(pd.DataFrame(rows_wom_diff), headers)+"\n\n")
+    file.write(tabulate(pd.DataFrame(rows_wom_diff), headers, tablefmt="pipe")+"\n\n")
 
     men_diff = vals_ours_men - vals_pcorr_w_men
     men_diff = pd.DataFrame(men_diff.reshape(-1, 12))
     rows_men_diff = st3_tbl_rows(men_diff)
-    file.write(tabulate(pd.DataFrame(rows_men_diff), headers)+"\n\n")
+    file.write(tabulate(pd.DataFrame(rows_men_diff), headers, tablefmt="pipe")+"\n\n")
 
     # Using weighted correlations
     file.write("## Spearman correlations Table")
@@ -281,13 +281,13 @@ def st3(dfTr, dfTe):
     dfMen, dfMenWeights = f_vars(dfMen)
 
     rows_wom, vals_wom  = st3_tbl(dfWomen, dfWomenWeights, True)
-    file.write(tabulate(rows_wom, headers)+"\n\n")
+    file.write(tabulate(rows_wom, headers, tablefmt="pipe")+"\n\n")
 
     rows_men, vals_men  = st3_tbl(dfMen, dfMenWeights, True)
-    file.write(tabulate(rows_men, headers)+"\n\n")
+    file.write(tabulate(rows_men, headers, tablefmt="pipe")+"\n\n")
 
     # Using weighted correlations
-    file.write("## Diff Our Weighted Pearson to Our Weighted Spearman")
+    file.write("## Diff Our Weighted Pearson to Our Weighted Spearman \n\n")
     file.write( "Minor differences ~2% observed"
                 "\n\n"
     )
@@ -295,15 +295,14 @@ def st3(dfTr, dfTe):
     wom_diff = vals_pcorr_w_wom - vals_wom
     wom_diff = pd.DataFrame(wom_diff.reshape(-1, 12))
     rows_wom_diff = st3_tbl_rows(wom_diff)
-    file.write(tabulate(pd.DataFrame(rows_wom_diff), headers)+"\n\n")
+    file.write(tabulate(pd.DataFrame(rows_wom_diff), headers, tablefmt="pipe")+"\n\n")
 
     men_diff = vals_pcorr_w_men - vals_men
     men_diff = pd.DataFrame(men_diff.reshape(-1, 12))
     rows_men_diff = st3_tbl_rows(men_diff)
-    file.write(tabulate(pd.DataFrame(rows_men_diff), headers)+"\n\n")
+    file.write(tabulate(pd.DataFrame(rows_men_diff), headers, tablefmt="pipe")+"\n\n")
 
     file.close()
-
 
 ''' Check the manual calculation of the weighted correlation
 x = (dfWomen[iHeight].pow(3)/(dfWomen[iWaist]*dfWomen[iWeight])).tolist()

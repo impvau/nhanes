@@ -72,14 +72,13 @@ def gen_wom_fs(df, dfWs, isCw = False):
         (r"$$\dfrac{h}{ab\cdot \sqrt{w}}$$",            c(df[iHeight]/(df[iWaist]*df[iWeight].pow(0.5)))),
         (r"$$\dfrac{h^2}{w}$$",                         c(df[iHeight].pow(2)/(df[iWeight]))),
         (r"$$\dfrac{h^2}{{ab}^2\cdot \sqrt{w}}$$",      c(df[iHeight].pow(2)/(df[iWaist].pow(2)*df[iWeight].pow(0.5)))),
-        (r"$$\dfrac{h^2}{{ab}^{1.5}\cdot \sqrt{w}}$$",  c(df[iHeight].pow(2)/(df[iWaist].pow(1.5)*df[iWeight]))),
+        (r"$$\dfrac{h^2}{{ab}^{1.5}\cdot \sqrt{w}}$$",  c(df[iHeight].pow(2)/(df[iWaist].pow(1.5)*df[iWeight])))
 
     ]
 
-    '''
-    (r"\dfrac{h^3}{\sqrt{ab}*\sqrt{w}}", (df[iHeight].pow(3)/(df[iWaist].pow(0.5)*df[iWeight].pow(0.5))).corr(df[iBodyFatPct])),
-    (r"\dfrac{h^3}{ab*\sqrt{w}}", (df[iHeight].pow(3)/(df[iWaist]*df[iWeight].pow(0.5))).corr(df[iBodyFatPct])),
-    (r"\dfrac{h^3}{w}", (df[iHeight].pow(3)/(df[iWeight])).corr(df[iBodyFatPct])),
-    (r"\dfrac{h}{w}", (df[iHeight]/(df[iWeight].pow(0.5))).corr(df[iBodyFatPct])),
-    (r"\dfrac{h}{a*\sqrt{ab}}", (df[iHeight]/(df[iArm]*df[iWaist].pow(0.5))).corr(df[iBodyFatPct])),
-    '''
+    #(r"\dfrac{h^3}{\sqrt{ab}*\sqrt{w}}", (df[iHeight].pow(3)/(df[iWaist].pow(0.5)*df[iWeight].pow(0.5))).corr(df[iBodyFatPct])),
+    #(r"\dfrac{h^3}{ab*\sqrt{w}}", (df[iHeight].pow(3)/(df[iWaist]*df[iWeight].pow(0.5))).corr(df[iBodyFatPct])),
+    #(r"\dfrac{h^3}{w}", (df[iHeight].pow(3)/(df[iWeight])).corr(df[iBodyFatPct])),
+    #(r"\dfrac{h}{w}", (df[iHeight]/(df[iWeight].pow(0.5))).corr(df[iBodyFatPct])),
+    #(r"\dfrac{h}{a*\sqrt{ab}}", (df[iHeight]/(df[iArm]*df[iWaist].pow(0.5))).corr(df[iBodyFatPct])),
+    

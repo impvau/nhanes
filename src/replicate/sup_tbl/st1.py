@@ -295,9 +295,9 @@ def st1(dfTr, dfTe):
 
     # Removing NAs
     file.write("## Table 1 Removing NaNs\n")
-    file.write(f"We remove NaNs from the columns {','.join(iTrConsidered)}. We do this to avoid any potential issues in correlation from missing values. \n\n")
+    file.write(f"We remove NaNs from the columns {','.join(iConsider)}. We do this to avoid any potential issues in correlation from missing values. \n\n")
     dfTrain = f_all_paper(dfTr)
-    dfTrain = dfTrain.dropna(subset=iTrConsidered, axis=0)
+    dfTrain = dfTrain.dropna(subset=iConsider, axis=0)
     dfWomen = f_wom(dfTrain)
     dfMen = f_men(dfTrain)
     dfWomenNonImp, dfWomenImp = f_nimp(dfWomen, True), f_imp(dfWomen, True)
@@ -315,6 +315,9 @@ def st1(dfTr, dfTe):
     file.write("We correctly limits race codes and removes NaNs, resulting in the following data \n\n")
     dfTrain = f_all_ours(dfTr)
     dfWomen = f_wom(dfTrain)
+    dfMen = f_men(dfTrain)
+    dfTrain.to_csv(f"{outDataDir}/andy_test.csv", index=False)
+
     dfWomenNonImp, dfWomenImp = f_nimp(dfWomen, True), f_imp(dfWomen, True)
     dfMenNonImp, dfMenImp = f_nimp(dfMen, True), f_imp(dfMen, True)
     vals_ours = st1_tbl()

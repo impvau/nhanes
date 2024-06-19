@@ -2,6 +2,7 @@
 from download import *
 from preproc import *
 from globals import *
+from indices import *
 from replicate.replicate import *
 
 download(dataDir)
@@ -19,3 +20,12 @@ dfTrainPaper.to_csv( f"{outDataDir}/train_paper.csv", index=False)
 dfTestPaper.to_csv(f"{outDataDir}/test_paper.csv", index=False)
 dfTrainOurs.to_csv(f"{outDataDir}/train_ours.csv", index=False)
 dfTestOurs.to_csv(f"{outDataDir}/test_ours.csv", index=False)
+
+# We create a subset of the data with only the key fields, and we rename those fields appropriately
+dfTrainOurs_filtered = dfTrainOurs.loc[:, iConsider]
+dfTrainOurs_filtered.columns = iRename
+dfTrainOurs_filtered.to_csv(f"{outDataDir}/train_ours_min.csv", index=False)
+
+dfTestOurs_filtered = dfTestOurs.loc[:, iConsider]
+dfTestOurs_filtered.columns = iRename
+dfTestOurs_filtered.to_csv(f"{outDataDir}/test_ours_min.csv", index=False)

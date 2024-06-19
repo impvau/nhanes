@@ -37,9 +37,9 @@ expected = [
 
     -0.7925, -0.8228,
     -0.7913,  0.8224,
-    -0.7899,  0.8224,
-    -0.7898, -0.8222,
-    -0.7898, -0.8193
+    -0.7899, -0.8222,
+    -0.7898, -0.8193,
+    -0.7898, 0.8192
 ]
 
 '''
@@ -83,7 +83,7 @@ def st4_tbl_diff(form_wom, form_men, vals):
     idx = 0  # Counter for vals array
     for zip_idx, (men_formula, women_formula) in enumerate(zip(form_men, form_wom)):
 
-        print(f"{women_formula[0]}: {float(women_formula[1])}-{vals[idx]}, {men_formula[0]}: {float(men_formula[1])}-{vals[idx+1]}, ")
+        #print(f"{women_formula[0]}: {float(women_formula[1])}-{vals[idx]}, {men_formula[0]}: {float(men_formula[1])}-{vals[idx+1]}, ")
         # Subtracting the values from vals for the respective indices
         women_value = float(women_formula[1]) - vals[idx]
         men_value = float(men_formula[1]) - vals[idx + 1]
@@ -96,7 +96,7 @@ def st4_tbl_diff(form_wom, form_men, vals):
 
         idx += 2  # Increment the counter by 2 for the next pair of values
 
-    print(vals)
+    #print(vals)
     return rows
 
 def st4(dfTr, dfTe):
@@ -110,6 +110,7 @@ def st4(dfTr, dfTe):
     global dfMen
    
     dfTrain = f_all_paper(dfTr)
+    #dfTrain = dfTrain.dropna(subset=iConsider, axis=0)
     dfWomen = f_wom(dfTrain)
     dfWomen, dfWomenWeights = f_vars(dfWomen)
     dfMen = f_men(dfTrain)
@@ -144,12 +145,56 @@ def st4(dfTr, dfTe):
     formulas_wom = round_correlation_values(formulas_wom, decimal_places)
     formulas_wom.extend([("", "")] * (max_len - len(formulas_wom)))
     
+    ### Reproduce table
     file.write(tabulate(st4_tbl(formulas_wom, formulas_men), headers=table_headers, tablefmt="pipe"))
     file.write("\n\n")
 
+    # Diff reproduction to ours
     file.write("# Diff Supplimentary Table 4 Paper-Replicated\n")
-
     file.write(tabulate(st4_tbl_diff(formulas_wom, formulas_men, expected[:40]), headers=table_headers_diff, tablefmt="pipe"))
+    file.write("\n\n")
+
+    ### Reproduce by with weighted correlation
+    # Extract men correlations
+    formulas_men_w = gen_men_fs(dfMen, dfMenWeights, True)
+    max_len = len(formulas_men_w)
+    formulas_men_w = round_correlation_values(formulas_men_w, decimal_places)
+    formulas_men_w.extend([("", "")] * (max_len - len(formulas_men_w)))
+    # Extract women correlations
+    formulas_wom_w = gen_wom_fs(dfWomen, dfWomenWeights, True)
+    formulas_wom_w = round_correlation_values(formulas_wom_w, decimal_places)
+    formulas_wom_w.extend([("", "")] * (max_len - len(formulas_wom_w)))
+    # Weighted Table
+    file.write("# Weighted Correlation Table\n")
+    file.write(tabulate(st4_tbl(formulas_wom_w, formulas_men_w), headers=table_headers, tablefmt="pipe"))
+    file.write("\n\n")
+    # Diff Weighted Tabl
+    file.write("# Diff Supplimentary Table 4 Paper-Replicated\n")
+    file.write(tabulate(st4_tbl_diff(formulas_wom_w, formulas_men_w, expected[:40]), headers=table_headers_diff, tablefmt="pipe"))
+    file.write("\n\n")
+
+    ### Reproduce by with weighted correlation
+    dfTrain = f_all_ours(dfTr)
+    dfWomen = f_wom(dfTrain)
+    dfWomen, dfWomenWeights = f_vars(dfWomen)
+    dfMen = f_men(dfTrain)
+    dfMen, dfMenWeights = f_vars(dfMen)
+    # Extract men correlations
+    formulas_men_w = gen_men_fs(dfMen, dfMenWeights, True)
+    max_len = len(formulas_men_w)
+    formulas_men_w = round_correlation_values(formulas_men_w, decimal_places)
+    formulas_men_w.extend([("", "")] * (max_len - len(formulas_men_w)))
+    # Extract women correlations
+    formulas_wom_w = gen_wom_fs(dfWomen, dfWomenWeights, True)
+    formulas_wom_w = round_correlation_values(formulas_wom_w, decimal_places)
+    formulas_wom_w.extend([("", "")] * (max_len - len(formulas_wom_w)))
+    # Weighted Table
+    file.write("# Weighted Correlation Table With Our Data\n")
+    file.write(tabulate(st4_tbl(formulas_wom_w, formulas_men_w), headers=table_headers, tablefmt="pipe"))
+    file.write("\n\n")
+    # Diff Weighted Tabl
+    file.write("# Diff Supplimentary Table 4 Paper-Replicated\n")
+    file.write(tabulate(st4_tbl_diff(formulas_wom_w, formulas_men_w, expected[:40]), headers=table_headers_diff, tablefmt="pipe"))
     file.write("\n\n")
 
     file.close()

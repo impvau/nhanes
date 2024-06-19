@@ -106,7 +106,7 @@ def pt1_age_pct():
     # Age Category data collection
     age_categories = [
         ("20-39 years old", f_age_y),
-        ("20-39 years old", f_age_m),  # This seems to be a duplicate label. Consider updating.
+        ("40-59 years old", f_age_m),  # This seems to be a duplicate label. Consider updating.
         (">=60 years old", f_age_a)
     ]
 
@@ -221,7 +221,7 @@ def pt1_tbl_from_vals(paper_vals, our_vals):
         ["European-American %"] + diff_vals[12:16],
         ["African-American %"] + diff_vals[16:20],
         ["20-39 years old %"] + diff_vals[20:24],
-        ["20-39 years old %"] + diff_vals[24:28],
+        ["40-59 years old %"] + diff_vals[24:28],
         [">=60 years old %"] + diff_vals[28:32],
         ["<18.5 %"] + diff_vals[32:36],
         ["18.5-24.9 %"] + diff_vals[36:40],
@@ -294,11 +294,11 @@ def pt1(dfTr, dfTe):
 
     # Removing NAs
     file.write("## Table 1 Removing NaNs\n")
-    file.write(f"We remove NaNs from the columns {','.join(iTrConsidered)}. We do this to avoid any potential issues in correlation from missing values. \n\n")
+    file.write(f"We remove NaNs from the columns {','.join(iConsider)}. We do this to avoid any potential issues in correlation from missing values. \n\n")
     dfTrain = f_all_paper(dfTr)
     dfTest = f_all_paper(dfTe, False)
-    dfTrain = dfTrain.dropna(subset=iTrConsidered, axis=0)
-    dfTest = dfTest.dropna(subset=iTeConsidered, axis=0)
+    dfTrain = dfTrain.dropna(subset=iConsider, axis=0)
+    dfTest = dfTest.dropna(subset=iConsider, axis=0)
     dfWomenTrain, dfWomenTest = f_wom(dfTrain), f_wom(dfTest)
     dfMenTrain, dfMenTest = f_men(dfTrain), f_men(dfTest)
     nas_race = pt1_tbl()
