@@ -161,5 +161,3 @@ def download(dir):
                     with open(fileName, 'wb') as file:
                         for chunk in response.iter_content(chunk_size=8192):
                             file.write(chunk)
-
-
